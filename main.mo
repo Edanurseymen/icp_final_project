@@ -1,5 +1,4 @@
 import Invoice "canister:invoice";
-
 import Hash       "mo:base/Hash";
 import HashMap    "mo:base/HashMap";
 import Iter       "mo:base/Iter";
