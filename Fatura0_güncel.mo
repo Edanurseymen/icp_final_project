@@ -10,7 +10,7 @@ import Product "mo:product"; // Product actor arayüzü
 actor Company {
 
   // Şirket veri yapısı
-  type Company = record {
+  type Company {
     id : Nat;
     name : Text;
     address : Text;
