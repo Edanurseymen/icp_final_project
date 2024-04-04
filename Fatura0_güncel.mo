@@ -1,6 +1,8 @@
 import Trie "mo:stdlib/trie";
 import Random "mo:base/Random";
 import Result "mo:base/Result";
+import Nat "mo:base/Nat";
+import Nat64 "mo:base/Nat64";
 import Text "mo:base/Text";
 import Company "mo:company"; // Company actor arayüzü
 import Product "mo:product"; // Product actor arayüzü
@@ -92,7 +94,7 @@ actor Product {
 
   // Ürün veri yapısı
   type Product = record {
-    id : Nat;
+    id : Nat64;
     company_id : Nat;
     name : Text;
     brand : Text;
@@ -116,12 +118,12 @@ actor Product {
   };
 
   // ID'ye göre ürün bilgisini getirme fonksiyonu
-  public func get_product_by_id(id : Nat) : async ?Product {
+  public func get_product_by_id(id : Nat64) : async ?Product {
     return Trie.find(product_trie, id); 
   };
 
   // Ürün bilgisini güncelleme fonksiyonu
-  public func update_product(id : Nat, company_id : Nat, name : Text, brand : Text, price : Nat) : async Bool {
+  public func update_product(id : Nat64, company_id : Nat, name : Text, brand : Text, price : Nat) : async Bool {
     let product_opt = Trie.find(product_trie, id);
     switch(product_opt) {
       case null {
@@ -138,7 +140,7 @@ actor Product {
   };
 
   // Ürün kaydını silme fonksiyonu
-  public func delete_product(id : Nat) : async Bool {
+  public func delete_product(id : Nat64) : async Bool {
     let product_opt = Trie.find(product_trie, id);
     switch(product_opt) {
       case null {
@@ -227,7 +229,7 @@ func get_user_by_id(id : Nat) : async Result<User, Text> {  //kulanıcı bulunam
 actor Invoice {
   // Fatura veri yapısı
 type Invoice = record {
-  id : Nat;                // Fatura ID
+  id : Nat64;                // Fatura ID
   company_id : Nat;       // Şirket ID
   product_ids : List(Nat); // Ürün ID'leri listesi
   seller_id : Nat;         // Satıcı ID
@@ -239,21 +241,21 @@ type Invoice = record {
 
   // Fatura oluşturma fonksiyonu
   public func create_invoice(company_id : Nat, product_ids : vec Nat, seller_id : Nat, customer_name : Text) : async Nat {
-    let new_id = // ... (Rastgele ID oluşturma işlemi)
+    let new_id = await generate_id();
     let new_invoice = { id = new_id; company_id = company_id; product_ids = product_ids; seller_id = seller_id; customer_name = customer_name };
     invoice_trie := Trie.insert(invoice_trie, new_id, new_invoice);
     return new_id;
   };
 
   // ID'ye göre fatura bilgisi getirme fonksiyonu
-  public func get_invoice_by_id(id : Nat) : async ?Invoice {
+  public func get_invoice_by_id(id : Nat64) : async ?Invoice {
     return Trie.find(invoice_trie, id);
   };
 
  stable var invoices : List(Invoice) = [];  // Fatura listesini depolamak için bir değişken
 
 //fatura güncelleme
-  public func update_invoice(id : Nat, company_id : Nat, product_ids : List(Nat), seller_id : Nat, customer_name : Text) : async Result<(), Text> {
+  public func update_invoice(id : Nat64, company_id : Nat, product_ids : List(Nat), seller_id : Nat, customer_name : Text) : async Result<(), Text> {
     let index = invoices.findIndex(|invoice| invoice.id == id);
     if (index == null) {
       return Err("Fatura bulunamadı.");
